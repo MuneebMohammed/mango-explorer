@@ -832,16 +832,16 @@ def build_redeem_accrued_mango_instructions(context: Context, wallet: Wallet, pe
             AccountMeta(is_signer=False, is_writable=True, pubkey=wallet.investin_mngo),
             AccountMeta(is_signer=False, is_writable=True, pubkey=context.mango_program_address),
 
-            AccountMeta(is_signer=False, is_writable=False, pubkey=group.address),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=group.address),
             AccountMeta(is_signer=False, is_writable=False, pubkey=group.cache),
             AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
             AccountMeta(is_signer=False, is_writable=False, pubkey=wallet.investin_fund),
             AccountMeta(is_signer=False, is_writable=False, pubkey=perp_market.address),
             AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market.underlying_perp_market.mngo_vault),
-            AccountMeta(is_signer=False, is_writable=False, pubkey=mngo.root_bank.address),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=mngo.root_bank.address),
             AccountMeta(is_signer=False, is_writable=True, pubkey=node_bank.address),
             AccountMeta(is_signer=False, is_writable=True, pubkey=node_bank.vault),
-            AccountMeta(is_signer=False, is_writable=False, pubkey=group.signer_key),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=group.signer_key),
             AccountMeta(is_signer=False, is_writable=False, pubkey=TOKEN_PROGRAM_ID),
             AccountMeta(is_signer=False, is_writable=False, pubkey=SYSTEM_PROGRAM_ADDRESS)
 
@@ -858,7 +858,7 @@ def build_redeem_accrued_mango_instructions(context: Context, wallet: Wallet, pe
             AccountMeta(is_signer=False, is_writable=False, pubkey=group.signer_key),
             AccountMeta(is_signer=False, is_writable=False, pubkey=TOKEN_PROGRAM_ID)
         ],
-        program_id=context.mango_program_address,
+        program_id = wallet.investin_id if wallet.investin_id else context.mango_program_address,
         data=layouts.REDEEM_MNGO.build(dict())
     )
     return CombinableInstructions(signers=[], instructions=[redeem_accrued_mango_instruction])
