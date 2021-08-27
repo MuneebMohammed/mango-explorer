@@ -1170,7 +1170,7 @@ SERUM_INSTRUCTION_VARIANT_FINDER = construct.Struct(
 # /// 6. `[writable]` asks_ai - TODO
 # /// 7. `[writable]` event_queue_ai - TODO
 PLACE_PERP_ORDER = construct.Struct(
-    "variant" / construct.Const(12, construct.BytesInteger(4, swapped=True)),
+    "variant" / construct.Const(8, construct.BytesInteger(4, swapped=True)),
 
     "price" / SignedDecimalAdapter(),
     "quantity" / SignedDecimalAdapter(),
@@ -1328,7 +1328,7 @@ CANCEL_SPOT_ORDER = construct.Struct(
 # 5. `[writable]` asksPk
 # 6. `[writable]` eventQueuePk
 CANCEL_PERP_ORDER_BY_CLIENT_ID = construct.Struct(
-    "variant" / construct.Const(13, construct.BytesInteger(4, swapped=True)),
+    "variant" / construct.Const(9, construct.BytesInteger(4, swapped=True)),
 
     "client_order_id" / DecimalAdapter(),
     "invalid_id_ok" / construct.Flag
@@ -1403,7 +1403,7 @@ INIT_SPOT_OPEN_ORDERS = construct.Struct(
 # /// 9. `[]` signer_ai - Group Signer Account
 # /// 10. `[]` token_prog_ai - SPL Token program id
 REDEEM_MNGO = construct.Struct(
-    "variant" / construct.Const(33, construct.BytesInteger(4, swapped=True))
+    "variant" / construct.Const(10, construct.BytesInteger(4, swapped=True))
 )
 
 UNSPECIFIED = construct.Struct(
@@ -1419,9 +1419,9 @@ InstructionParsersByVariant = {
     5: UNSPECIFIED,  # ADD_TO_BASKET,
     6: UNSPECIFIED,  # BORROW,
     7: UNSPECIFIED,  # CACHE_PRICES,
-    8: UNSPECIFIED,  # CACHE_ROOT_BANKS,
-    9: PLACE_SPOT_ORDER,  # PLACE_SPOT_ORDER,
-    10: UNSPECIFIED,  # ADD_ORACLE,
+    8: PLACE_PERP_ORDER,  # CACHE_ROOT_BANKS,
+    9: CANCEL_PERP_ORDER_BY_CLIENT_ID,  # PLACE_SPOT_ORDER,
+    10: REDEEM_MNGO,  # ADD_ORACLE,
     11: UNSPECIFIED,  # ADD_PERP_MARKET,
     12: PLACE_PERP_ORDER,  # PLACE_PERP_ORDER,
     13: CANCEL_PERP_ORDER_BY_CLIENT_ID,  # CANCEL_PERP_ORDER_BY_CLIENT_ID,

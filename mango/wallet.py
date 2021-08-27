@@ -54,10 +54,17 @@ _DEFAULT_WALLET_FILENAME: str = "id.json"
 
 
 class Wallet:
-    def __init__(self, secret_key):
+    def __init__(self, secret_key, investin_data=None):
         self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
         self.secret_key = secret_key[0:32]
         self.account = Account(self.secret_key)
+
+        # investin data
+        self.investin_id = PublicKey(investin_data['program_id']) if investin_data else None
+        self.investin_fund = PublicKey(investin_data['fund_address']) if investin_data else None
+        self.investin_state = PublicKey(investin_data['fund_state']) if investin_data else None
+        self.investin_mngo = PublicKey(investin_data['mngo_vault']) if investin_data else None
+
 
     @property
     def address(self) -> PublicKey:
@@ -79,6 +86,17 @@ class Wallet:
             with open(filename) as json_file:
                 data = json.load(json_file)
                 return Wallet(data)
+    
+    @staticmethod
+    def load_investin(id_file, investin_file) -> "Wallet":
+        if not os.path.isfile(id_file) or not os.path.isfile(investin_file):
+            logging.error(f"Wallet file is not present.")
+            raise Exception(f"Wallet file is not present.")
+        else:
+            with open(id_file) as id_json, open(investin_file) as inv_json:
+                id_data = json.load(id_json)
+                inv_data = json.load(inv_json)
+                return Wallet(id_data, inv_data)
 
     @staticmethod
     def create() -> "Wallet":
@@ -112,6 +130,10 @@ class Wallet:
             secret_key_bytes = json.loads(environment_secret_key)
             if len(secret_key_bytes) >= 32:
                 return Wallet(secret_key_bytes)
+
+        # check for investin
+        if args.investin is not None:
+            return Wallet.load_investin(args.id_file, args.investin)
 
         # Here we should have values for all our parameters.
         id_filename = args.id_file

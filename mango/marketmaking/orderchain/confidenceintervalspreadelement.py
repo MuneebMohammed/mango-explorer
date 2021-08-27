@@ -52,6 +52,7 @@ class ConfidenceIntervalSpreadElement(Element):
             charge = price.confidence * confidence_interval_level
             bid: Decimal = price.mid_price - charge
             ask: Decimal = price.mid_price + charge
+            print("====== new orders:: ", new_orders)
 
             new_orders += [
                 mango.Order.from_basic_info(mango.Side.BUY, price=bid,
@@ -62,6 +63,7 @@ class ConfidenceIntervalSpreadElement(Element):
 
         new_orders.sort(key=lambda ord: ord.price, reverse=True)
         order_text = "\n    ".join([f"{order}" for order in new_orders])
+        print("orders:: ", order_text)
 
         top_bid = model_state.top_bid
         top_ask = model_state.top_ask

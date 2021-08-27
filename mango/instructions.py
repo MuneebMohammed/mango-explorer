@@ -344,15 +344,26 @@ def build_cancel_perp_order_instructions(context: Context, wallet: Wallet, accou
 
     instructions = [
         TransactionInstruction(
-            keys=[
+            keys = [
+                AccountMeta(is_signer=False, is_writable=False, pubkey=wallet.investin_state),
+                AccountMeta(is_signer=True, is_writable=False, pubkey=wallet.address),
+                AccountMeta(is_signer=False, is_writable=False, pubkey=context.mango_program_address),
+
+                AccountMeta(is_signer=False, is_writable=False, pubkey=account.group.address),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
+                AccountMeta(is_signer=False, is_writable=False, pubkey=wallet.investin_fund),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.address),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.bids),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.asks)
+            ] if wallet.investin_id else [
                 AccountMeta(is_signer=False, is_writable=False, pubkey=account.group.address),
                 AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
                 AccountMeta(is_signer=True, is_writable=False, pubkey=wallet.address),
                 AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.address),
                 AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.bids),
                 AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.asks)
-            ],
-            program_id=context.mango_program_address,
+            ] ,
+            program_id = wallet.investin_id if wallet.investin_id else context.mango_program_address,
             data=data
         )
     ]
@@ -388,6 +399,20 @@ def build_place_perp_order_instructions(context: Context, wallet: Wallet, group:
     instructions = [
         TransactionInstruction(
             keys=[
+                AccountMeta(is_signer=False, is_writable=True, pubkey=wallet.investin_state),
+                AccountMeta(is_signer=True, is_writable=True, pubkey=wallet.address),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=context.mango_program_address),
+
+                AccountMeta(is_signer=False, is_writable=False, pubkey=group.address),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
+                AccountMeta(is_signer=False, is_writable=False, pubkey=wallet.investin_fund),
+                AccountMeta(is_signer=False, is_writable=False, pubkey=group.cache),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.address),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.bids),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.asks),
+                AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market_details.event_queue),
+                AccountMeta(is_signer=False, is_writable=False, pubkey = SYSTEM_PROGRAM_ADDRESS)
+            ] if wallet.investin_id else [
                 AccountMeta(is_signer=False, is_writable=False, pubkey=group.address),
                 AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
                 AccountMeta(is_signer=True, is_writable=False, pubkey=wallet.address),
@@ -399,7 +424,7 @@ def build_place_perp_order_instructions(context: Context, wallet: Wallet, group:
                 *list([AccountMeta(is_signer=False, is_writable=False,
                                    pubkey=oo_address or SYSTEM_PROGRAM_ADDRESS) for oo_address in account.spot_open_orders])
             ],
-            program_id=context.mango_program_address,
+            program_id = wallet.investin_id if wallet.investin_id else context.mango_program_address,
             data=layouts.PLACE_PERP_ORDER.build(
                 {
                     "price": native_price,
@@ -803,6 +828,24 @@ def build_redeem_accrued_mango_instructions(context: Context, wallet: Wallet, pe
     # /// 10. `[]` token_prog_ai - SPL Token program id
     redeem_accrued_mango_instruction = TransactionInstruction(
         keys=[
+            AccountMeta(is_signer=False, is_writable=True, pubkey=wallet.investin_state),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=wallet.investin_mngo),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=context.mango_program_address),
+
+            AccountMeta(is_signer=False, is_writable=False, pubkey=group.address),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=group.cache),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=wallet.investin_fund),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=perp_market.address),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=perp_market.underlying_perp_market.mngo_vault),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=mngo.root_bank.address),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=node_bank.address),
+            AccountMeta(is_signer=False, is_writable=True, pubkey=node_bank.vault),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=group.signer_key),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=TOKEN_PROGRAM_ID),
+            AccountMeta(is_signer=False, is_writable=False, pubkey=SYSTEM_PROGRAM_ADDRESS)
+
+        ] if wallet.investin_id else [
             AccountMeta(is_signer=False, is_writable=False, pubkey=group.address),
             AccountMeta(is_signer=False, is_writable=False, pubkey=group.cache),
             AccountMeta(is_signer=False, is_writable=True, pubkey=account.address),
